@@ -1,52 +1,95 @@
+/**
+ * Student tab layout.
+ *
+ * Visible tabs:  Home | Activity | QR | Alerts | Profile
+ * Hidden routes: attendance, help, emergency  (quick-actions only)
+ *
+ * Tab bar is theme-aware via useTheme().
+ */
+
 import { Tabs } from 'expo-router';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/theme/colors';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useTheme } from '@/hooks/useTheme';
 import { HapticTab } from '@/components/navigation/haptic-tab';
 
+type MAIconName = React.ComponentProps<typeof MaterialIcons>['name'];
+
+function tabIcon(name: MAIconName) {
+  return ({ color }: { color: string }) => (
+    <MaterialIcons name={name} size={24} color={color} />
+  );
+}
+
 export default function StudentLayout() {
-  const colorScheme = useColorScheme();
+  const { palette, brand, colors } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
+        tabBarActiveTintColor: brand.blue,
+        tabBarInactiveTintColor: palette.textMuted,
         tabBarButton: HapticTab,
-      }}>
+        tabBarStyle: {
+          backgroundColor: palette.surface,
+          borderTopColor: palette.border,
+          borderTopWidth: 1,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontFamily: 'Inter_500Medium',
+        },
+      }}
+    >
+      {/* ── Visible tab: Home ─────────────────────────────────────────────── */}
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="house.fill" color={color} />,
+          tabBarIcon: tabIcon('home'),
         }}
       />
+
+      {/* ── Visible tab: Activity ─────────────────────────────────────────── */}
+      <Tabs.Screen
+        name="activity"
+        options={{
+          title: 'Activity',
+          tabBarIcon: tabIcon('history'),
+        }}
+      />
+
+      {/* ── Visible tab: QR ───────────────────────────────────────────────── */}
       <Tabs.Screen
         name="qr"
         options={{
-          title: 'My QR',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="chevron.left.forwardslash.chevron.right" color={color} />,
+          title: 'QR',
+          tabBarIcon: tabIcon('qr-code-2'),
         }}
       />
-      <Tabs.Screen
-        name="attendance"
-        options={{
-          title: 'Attendance',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="paperplane.fill" color={color} />,
-        }}
-      />
+
+      {/* ── Visible tab: Alerts (notifications) ───────────────────────────── */}
       <Tabs.Screen
         name="notifications"
         options={{
           title: 'Alerts',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="paperplane.fill" color={color} />,
+          tabBarIcon: tabIcon('notifications-none'),
         }}
       />
-      {/* Hidden screens — accessible via navigation, not tab bar */}
-      <Tabs.Screen name="activity" options={{ href: null }} />
+
+      {/* ── Visible tab: Profile ──────────────────────────────────────────── */}
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: tabIcon('person-outline'),
+        }}
+      />
+
+      {/* ── Hidden routes — reachable via quick-actions, not the tab bar ──── */}
+      <Tabs.Screen name="attendance" options={{ href: null }} />
       <Tabs.Screen name="help" options={{ href: null }} />
       <Tabs.Screen name="emergency" options={{ href: null }} />
-      <Tabs.Screen name="profile" options={{ href: null }} />
     </Tabs>
   );
 }

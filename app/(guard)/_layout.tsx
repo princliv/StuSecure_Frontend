@@ -1,44 +1,93 @@
+/**
+ * Guard tab layout.
+ *
+ * Visible tabs:  Home | Scanner | Alerts | Activity | Profile
+ * Hidden routes: scan-result  (pushed from QRScannerScreen on successful scan)
+ *
+ * Tab bar is theme-aware via useTheme().
+ */
+
 import { Tabs } from 'expo-router';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/theme/colors';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useTheme } from '@/hooks/useTheme';
 import { HapticTab } from '@/components/navigation/haptic-tab';
 
+type MAIconName = React.ComponentProps<typeof MaterialIcons>['name'];
+
+function tabIcon(name: MAIconName) {
+  return ({ color }: { color: string }) => (
+    <MaterialIcons name={name} size={24} color={color} />
+  );
+}
+
 export default function GuardLayout() {
-  const colorScheme = useColorScheme();
+  const { palette, brand, colors } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
+        tabBarActiveTintColor: brand.blue,
+        tabBarInactiveTintColor: palette.textMuted,
         tabBarButton: HapticTab,
-      }}>
+        tabBarStyle: {
+          backgroundColor: palette.surface,
+          borderTopColor: palette.border,
+          borderTopWidth: 1,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontFamily: 'Inter_500Medium',
+        },
+      }}
+    >
+      {/* ── Visible tab: Home ───────────────────────────────────────────────── */}
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="house.fill" color={color} />,
+          tabBarIcon: tabIcon('home'),
         }}
       />
+
+      {/* ── Visible tab: Scanner ────────────────────────────────────────────── */}
       <Tabs.Screen
         name="scanner"
         options={{
           title: 'Scanner',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="chevron.left.forwardslash.chevron.right" color={color} />,
+          tabBarIcon: tabIcon('qr-code-scanner'),
         }}
       />
+
+      {/* ── Visible tab: Alerts ─────────────────────────────────────────────── */}
       <Tabs.Screen
         name="alerts"
         options={{
           title: 'Alerts',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="paperplane.fill" color={color} />,
+          tabBarIcon: tabIcon('notifications-none'),
         }}
       />
-      {/* Hidden screens */}
+
+      {/* ── Visible tab: Activity ───────────────────────────────────────────── */}
+      <Tabs.Screen
+        name="activity"
+        options={{
+          title: 'Activity',
+          tabBarIcon: tabIcon('history'),
+        }}
+      />
+
+      {/* ── Visible tab: Profile ────────────────────────────────────────────── */}
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: tabIcon('person-outline'),
+        }}
+      />
+
+      {/* ── Hidden route — pushed by QRScannerScreen after a successful scan ── */}
       <Tabs.Screen name="scan-result" options={{ href: null }} />
-      <Tabs.Screen name="activity" options={{ href: null }} />
-      <Tabs.Screen name="profile" options={{ href: null }} />
     </Tabs>
   );
 }
