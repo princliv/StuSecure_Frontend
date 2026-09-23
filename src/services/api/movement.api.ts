@@ -34,6 +34,6 @@ export const movementApi = {
   getMyHistory: (params?: { page?: number; limit?: number }) =>
     apiClient.get<MovementListResponse>('/movements/me', { params }),
 
-  getAll: (params?: { page?: number; limit?: number; studentId?: string }) =>
+  getAll: (params?: { page?: number; limit?: number; studentId?: string; from?: string; to?: string }) =>
     apiClient.get<MovementListResponse>('/movements', { params }),
 };

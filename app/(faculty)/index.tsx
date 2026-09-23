@@ -1,10 +1,37 @@
-﻿import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+﻿import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 import BrandLogo from '@/components/ui/BrandLogo';
 import { radius } from '@/theme/radius';
 import { spacing } from '@/theme/spacing';
+
+function DashCard({
+  title,
+  meta,
+  action,
+  onPress,
+  palette,
+  brand,
+}: {
+  title: string;
+  meta: string;
+  action: string;
+  onPress: () => void;
+  palette: { surface: string; border: string; textPrimary: string; textMuted: string };
+  brand: { blue: string };
+}) {
+  return (
+    <TouchableOpacity
+      style={[styles.card, { backgroundColor: palette.surface, borderColor: palette.border }]}
+      onPress={onPress}
+    >
+      <Text style={[styles.cardTitle, { color: palette.textPrimary }]}>{title}</Text>
+      <Text style={[styles.cardMeta, { color: palette.textMuted }]}>{meta}</Text>
+      <Text style={[styles.link, { color: brand.blue }]}>{action}</Text>
+    </TouchableOpacity>
+  );
+}
 
 export default function FacultyDashboard() {
   const { palette, brand, statusBarStyle } = useTheme();
@@ -17,31 +44,48 @@ export default function FacultyDashboard() {
         <BrandLogo height={22} />
         <Text style={[styles.title, { color: palette.textPrimary }]}>Dashboard</Text>
       </View>
-      <View style={styles.body}>
-        <TouchableOpacity
-          style={[styles.card, { backgroundColor: palette.surface, borderColor: palette.border }]}
+      <ScrollView contentContainerStyle={styles.body}>
+        <DashCard
+          palette={palette}
+          brand={brand}
+          title="Help requests"
+          meta="Assign and resolve student transport, hostel, and medical requests."
+          action="Open inbox"
           onPress={() => router.push('/(faculty)/help-requests')}
-        >
-          <Text style={[styles.cardTitle, { color: palette.textPrimary }]}>Help requests</Text>
-          <Text style={[styles.cardMeta, { color: palette.textMuted }]}>
-            Assign and resolve student transport, hostel, and medical requests.
-          </Text>
-          <Text style={[styles.link, { color: brand.blue }]}>Open inbox</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.card,
-            { backgroundColor: palette.surface, borderColor: palette.border, marginTop: spacing.md },
-          ]}
+        />
+        <DashCard
+          palette={palette}
+          brand={brand}
+          title="Notifications"
+          meta="SOS, help, and system alerts for this campus."
+          action="Open alerts"
           onPress={() => router.push('/(faculty)/alerts')}
-        >
-          <Text style={[styles.cardTitle, { color: palette.textPrimary }]}>Notifications</Text>
-          <Text style={[styles.cardMeta, { color: palette.textMuted }]}>
-            SOS, help, and system alerts for this campus.
-          </Text>
-          <Text style={[styles.link, { color: brand.blue }]}>Open alerts</Text>
-        </TouchableOpacity>
-      </View>
+        />
+        <DashCard
+          palette={palette}
+          brand={brand}
+          title="Guards"
+          meta="On-duty security staff for this campus."
+          action="Open directory"
+          onPress={() => router.push('/(faculty)/guards')}
+        />
+        <DashCard
+          palette={palette}
+          brand={brand}
+          title="Attendance"
+          meta="Date-filtered check-in and check-out logs."
+          action="Open records"
+          onPress={() => router.push('/(faculty)/attendance')}
+        />
+        <DashCard
+          palette={palette}
+          brand={brand}
+          title="Reports"
+          meta="7-day movement totals and daily breakdown."
+          action="Open summary"
+          onPress={() => router.push('/(faculty)/reports')}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -56,7 +100,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   title: { fontSize: 20, fontWeight: '600', fontFamily: 'Inter_600SemiBold' },
-  body: { paddingHorizontal: 20 },
+  body: { paddingHorizontal: 20, paddingBottom: spacing.xxl, gap: spacing.md },
   card: {
     borderWidth: 1,
     borderRadius: radius.xl,
