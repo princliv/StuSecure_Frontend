@@ -138,7 +138,10 @@ export default function EmergencyScreen() {
     setState('sending');
     setErrorMsg(null);
     try {
-      await emergencyApi.triggerSOS({ type: 'SOS' });
+      await emergencyApi.triggerSOS({
+        type: 'SOS',
+        location: 'North Campus Library, Floor 2',
+      });
       activeFade.setValue(0);
       setState('active');
       Animated.timing(activeFade, {
@@ -149,7 +152,7 @@ export default function EmergencyScreen() {
     } catch (err: any) {
       setState('idle');
       const msg =
-        err?.response?.data?.message ?? err?.message ?? 'Failed to send SOS. Please try again.';
+        err?.response?.data?.error ?? err?.message ?? 'Failed to send SOS. Please try again.';
       setErrorMsg(msg);
     }
   }, []);

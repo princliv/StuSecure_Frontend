@@ -14,10 +14,13 @@ export function getSocket(): Socket {
   return socket;
 }
 
-export function connectSocket(token: string) {
+export function connectSocket(token: string, orgId?: string) {
   const s = getSocket();
   s.auth = { token };
   s.connect();
+  if (orgId) {
+    s.emit('org:join', orgId);
+  }
   return s;
 }
 

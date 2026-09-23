@@ -27,6 +27,8 @@ export default function AuthLayout() {
       <Stack.Screen name="register" />
       <Stack.Screen name="forgot-password" />
       <Stack.Screen name="verify-email" />
+      <Stack.Screen name="select-org" />
+      <Stack.Screen name="admin-web-only" />
     </Stack>
   );
 }

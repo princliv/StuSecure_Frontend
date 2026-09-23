@@ -7,10 +7,13 @@
  * Tab bar is theme-aware via useTheme().
  */
 
-import { Tabs } from 'expo-router';
+import { useEffect } from 'react';
+import { Tabs, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useTheme } from '@/hooks/useTheme';
 import { HapticTab } from '@/components/navigation/haptic-tab';
+import { useAuthStore } from '@/store/auth.store';
+import { routeByMembership } from '@/features/auth/routeByMembership';
 
 type MAIconName = React.ComponentProps<typeof MaterialIcons>['name'];
 
@@ -22,6 +25,25 @@ function tabIcon(name: MAIconName) {
 
 export default function GuardLayout() {
   const { palette, brand, colors } = useTheme();
+
+  // ── Role guard ────────────────────────────────────────────────────────────
+  const membership = useAuthStore((s) => {
+    const m = s.activeOrganizationId
+      ? s.memberships.find((x) => x.organizationId === s.activeOrganizationId) ?? s.memberships[0]
+      : s.memberships[0];
+    return m ?? null;
+  });
+
+  useEffect(() => {
+    if (!membership) {
+      router.replace('/(auth)/login');
+      return;
+    }
+    if (membership.role.toUpperCase() !== 'GUARD') {
+      routeByMembership(membership);
+    }
+  }, [membership]);
+  // ─────────────────────────────────────────────────────────────────────────
 
   return (
     <Tabs

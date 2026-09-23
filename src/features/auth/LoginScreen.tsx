@@ -30,6 +30,10 @@ import { router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import { firebaseAuth } from '@/services/firebase/auth';
+import { authApi } from '@/services/api/auth.api';
+import { setAuthToken } from '@/services/api/client';
+import { useAuthStore } from '@/store/auth.store';
+import { routeByMembership } from '@/features/auth/routeByMembership';
 import { useTheme } from '@/hooks/useTheme';
 import { brand } from '@/theme/colors';
 import type { AppPalette } from '@/theme/colors';
@@ -75,6 +79,8 @@ export default function LoginScreen() {
   const { palette, statusBarStyle } = useTheme();
   const styles = makeStyles(palette);
 
+  const { setProfile, setMemberships, selectOrg } = useAuthStore();
+
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -91,9 +97,34 @@ export default function LoginScreen() {
   const onSubmit = async (data: FormData) => {
     setGlobalError(null);
     try {
-      await firebaseAuth.signIn(data.email.trim(), data.password);
-      // AppProvider's onAuthStateChanged listener will update the auth store.
-      router.replace('/(student)/');
+      // 1. Firebase sign-in — get the ID token immediately.
+      const credential = await firebaseAuth.signIn(data.email.trim(), data.password);
+      const token = await firebaseAuth.getIdToken(credential.user);
+      setAuthToken(token);
+
+      // 2. Sync with the backend to get the user profile + memberships.
+      //    (AppProvider's onAuthStateChanged will do the same, but we need
+      //     the memberships right now for routing — don't wait for the listener.)
+      const { data: syncData } = await authApi.sync();
+      setProfile(syncData.user);
+      setMemberships(syncData.memberships);
+
+      // 3. Route by membership.
+      const mems = syncData.memberships;
+      if (mems.length === 0) {
+        setGlobalError('No organization found for your account. Contact your admin.');
+        return;
+      }
+
+      if (mems.length > 1) {
+        // Multiple orgs — let the user choose.
+        router.replace('/(auth)/select-org');
+        return;
+      }
+
+      // Single org — select it and route directly.
+      selectOrg(mems[0]);
+      routeByMembership(mems[0]);
     } catch (err: unknown) {
       const code =
         err != null && typeof err === 'object' && 'code' in err

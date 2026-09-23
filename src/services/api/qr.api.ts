@@ -1,11 +1,20 @@
 import { apiClient } from './client';
 
+export interface QRStudentSnapshot {
+  name: string;
+  enrollmentNo: string;
+  hostelName: string | null;
+  roomNumber: string | null;
+}
+
 export interface QRIdentity {
   id: string;
   studentId: string;
   token: string;
-  expiresAt?: string;
   isActive: boolean;
+  createdAt: string;
+  rotatedAt: string | null;
+  student: QRStudentSnapshot;
 }
 
 export const qrApi = {

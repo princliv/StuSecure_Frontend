@@ -18,6 +18,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Animated,
   ScrollView,
@@ -33,6 +34,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import QRCode from 'react-native-qrcode-svg';
 import * as Brightness from 'expo-brightness';
 import { useAuthStore } from '@/store/auth.store';
+import { qrApi, type QRIdentity } from '@/services/api/qr.api';
 import { useTheme } from '@/hooks/useTheme';
 import { brand } from '@/theme/colors';
 import type { AppPalette } from '@/theme/colors';
@@ -51,16 +53,7 @@ const GREEN_DARK = '#047857';
 /** Soft navy-tinted shadow colour */
 const SHADOW_NAVY = '#091C35';
 
-const MOCK_HOSTEL = 'Block B';
-const MOCK_ROOM = '302';
 const QR_REFRESH_SECONDS = 60;
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function generateQRValue(uid?: string): string {
-  const base = uid ?? 'demo';
-  return `stusecure-${base}-${Date.now()}`;
-}
 
 function getInitials(name: string): string {
   return name
@@ -166,44 +159,81 @@ export default function QRPassScreen() {
 
   const styles = makeStyles(palette, ICON_BG, ICON_FG);
 
-  const displayName =
-    profile?.displayName ?? firebaseUser?.displayName ?? 'Student';
-  const initials = getInitials(displayName);
-  const studentId = profile?.id
-    ? `STU${profile.id.slice(-8).toUpperCase()}`
-    : 'STU202408';
-  const uid = firebaseUser?.uid ?? profile?.id;
-
   // ── QR token + countdown ──────────────────────────────────────────────────
 
-  const [qrValue, setQrValue] = useState(() => generateQRValue(uid));
+  const [identity, setIdentity] = useState<QRIdentity | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [countdown, setCountdown] = useState(QR_REFRESH_SECONDS);
   const refreshSpin = useRef(new Animated.Value(0)).current;
+  const rotating = useRef(false);
 
-  const triggerRefresh = useCallback(() => {
-    setQrValue(generateQRValue(uid));
+  const applyIdentity = useCallback((next: QRIdentity) => {
+    setIdentity(next);
+    setLoadError(null);
     setCountdown(QR_REFRESH_SECONDS);
+  }, []);
+
+  const fetchQR = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await qrApi.getMyQR();
+      applyIdentity(data);
+    } catch {
+      setLoadError('Could not load your QR pass.');
+    } finally {
+      setLoading(false);
+    }
+  }, [applyIdentity]);
+
+  const triggerRefresh = useCallback(async () => {
+    if (rotating.current) return;
+    rotating.current = true;
     refreshSpin.setValue(0);
     Animated.timing(refreshSpin, {
       toValue: 1,
       duration: 400,
       useNativeDriver: true,
     }).start();
-  }, [uid, refreshSpin]);
+    try {
+      const { data } = await qrApi.rotateQR();
+      applyIdentity(data);
+    } catch {
+      setLoadError('Could not refresh QR. Showing your current pass.');
+    } finally {
+      rotating.current = false;
+    }
+  }, [applyIdentity, refreshSpin]);
 
-  // Countdown ticker
   useEffect(() => {
+    void fetchQR();
+  }, [fetchQR]);
+
+  useEffect(() => {
+    if (!identity) return;
     const id = setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
-          triggerRefresh();
+          void triggerRefresh();
           return QR_REFRESH_SECONDS;
         }
         return c - 1;
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [triggerRefresh]);
+  }, [triggerRefresh, identity]);
+
+  const displayName =
+    identity?.student.name ??
+    profile?.displayName ??
+    firebaseUser?.displayName ??
+    'Student';
+  const initials = getInitials(displayName);
+  const studentId = identity?.student.enrollmentNo ?? '—';
+  const hostelName = identity?.student.hostelName ?? '—';
+  const roomNumber = identity?.student.roomNumber ?? '—';
+  const qrValue = identity?.token ?? '';
+  const passActive = identity?.isActive ?? false;
 
   const spinInterpolation = refreshSpin.interpolate({
     inputRange: [0, 1],
@@ -269,6 +299,16 @@ export default function QRPassScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {loadError ? (
+          <TouchableOpacity onPress={() => void fetchQR()} activeOpacity={0.8}>
+            <Text style={{ color: palette.error, marginBottom: spacing.sm, textAlign: 'center' }}>
+              {loadError} Tap to retry.
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+        {loading && !identity ? (
+          <ActivityIndicator size="large" color={BLUE} style={{ marginVertical: spacing.xl }} />
+        ) : null}
         {/* ── Digital Pass card ─────────────────────────────────────────── */}
         <View style={styles.passCard}>
 
@@ -302,9 +342,9 @@ export default function QRPassScreen() {
             </View>
 
             {/* Active pill */}
-            <View style={styles.activePill}>
+            <View style={[styles.activePill, !passActive && { opacity: 0.45 }]}>
               <View style={styles.activeDot} />
-              <Text style={styles.activePillText}>Active</Text>
+              <Text style={styles.activePillText}>{passActive ? 'Active' : 'Inactive'}</Text>
             </View>
           </View>
 
@@ -315,12 +355,12 @@ export default function QRPassScreen() {
           <View style={styles.hostelRow}>
             <View style={styles.hostelCol}>
               <Text style={styles.hostelLabel}>HOSTEL</Text>
-              <Text style={styles.hostelValue}>{MOCK_HOSTEL}</Text>
+              <Text style={styles.hostelValue}>{hostelName}</Text>
             </View>
             <View style={styles.hostelDivider} />
             <View style={styles.hostelCol}>
               <Text style={styles.hostelLabel}>ROOM</Text>
-              <Text style={styles.hostelValue}>{MOCK_ROOM}</Text>
+              <Text style={styles.hostelValue}>{roomNumber}</Text>
             </View>
           </View>
 
@@ -330,13 +370,17 @@ export default function QRPassScreen() {
             <View style={styles.qrFrame}>
               <CornerBrackets size={220} />
               <View style={styles.qrInner}>
-                <QRCode
-                  value={qrValue}
-                  size={200}
-                  color="#000000"
-                  backgroundColor="#ffffff"
-                  quietZone={8}
-                />
+                {qrValue ? (
+                  <QRCode
+                    value={qrValue}
+                    size={200}
+                    color="#000000"
+                    backgroundColor="#ffffff"
+                    quietZone={8}
+                  />
+                ) : (
+                  <ActivityIndicator size="large" color={BLUE} />
+                )}
               </View>
             </View>
 
