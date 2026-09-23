@@ -1,10 +1,55 @@
-﻿import { View, Text, StyleSheet } from 'react-native';
+﻿import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { useTheme } from '@/hooks/useTheme';
+import BrandLogo from '@/components/ui/BrandLogo';
+import { radius } from '@/theme/radius';
+import { spacing } from '@/theme/spacing';
+
 export default function FacultyDashboard() {
+  const { palette, brand, statusBarStyle } = useTheme();
+  const router = useRouter();
+
   return (
-    <View style={styles.c}>
-      <Text style={styles.t}>Faculty Dashboard</Text>
-      {/* TODO: summary cards — total students, check-ins today, open emergencies */}
-    </View>
+    <SafeAreaView style={[styles.safe, { backgroundColor: palette.background }]} edges={['top']}>
+      <StatusBar barStyle={statusBarStyle} backgroundColor={palette.background} />
+      <View style={styles.header}>
+        <BrandLogo height={22} />
+        <Text style={[styles.title, { color: palette.textPrimary }]}>Dashboard</Text>
+      </View>
+      <View style={styles.body}>
+        <TouchableOpacity
+          style={[styles.card, { backgroundColor: palette.surface, borderColor: palette.border }]}
+          onPress={() => router.push('/(faculty)/help-requests')}
+        >
+          <Text style={[styles.cardTitle, { color: palette.textPrimary }]}>Help requests</Text>
+          <Text style={[styles.cardMeta, { color: palette.textMuted }]}>
+            Assign and resolve student transport, hostel, and medical requests.
+          </Text>
+          <Text style={[styles.link, { color: brand.blue }]}>Open inbox</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
-const styles = StyleSheet.create({ c: { flex:1, alignItems:'center', justifyContent:'center', padding:24 }, t: { fontSize:22, fontWeight:'bold' } });
+
+const styles = StyleSheet.create({
+  safe: { flex: 1 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: 20,
+    paddingVertical: spacing.md,
+  },
+  title: { fontSize: 20, fontWeight: '600', fontFamily: 'Inter_600SemiBold' },
+  body: { paddingHorizontal: 20 },
+  card: {
+    borderWidth: 1,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+  },
+  cardTitle: { fontSize: 16, fontWeight: '600', fontFamily: 'Inter_600SemiBold' },
+  cardMeta: { fontSize: 13, fontFamily: 'Inter_400Regular', marginTop: 4 },
+  link: { fontSize: 13, fontWeight: '600', fontFamily: 'Inter_600SemiBold', marginTop: spacing.md },
+});
