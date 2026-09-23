@@ -9,8 +9,12 @@ export default function RegisterScreen() {
       <Text style={styles.title}>Create Account</Text>
       <Text style={styles.subtitle}>Register to get started</Text>
 
-      {/* TODO: implement registration form */}
-      {/* TODO: call firebaseAuth.signUp then authApi.register */}
+      {/* TODO: implement registration form (name, email, password, role picker) */}
+      {/* TODO: call firebaseAuth.signUp(email, password), then
+          authApi.sync({ displayName, role }) to provision the StuSecure
+          account, then setProfile/setMemberships from the response before
+          navigating — see AppProvider's AuthBootstrap for the same call
+          shape used on every subsequent login. */}
 
       <TouchableOpacity style={styles.button} onPress={() => router.back()}>
         <Text style={styles.buttonText}>Back to Login</Text>

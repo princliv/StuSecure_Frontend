@@ -7,17 +7,17 @@ const tintColorDark = '#6B9BFF';
 
 /** Legacy expo-router tab colours */
 export const Colors = {
-  light: {
-    text: '#1b1b1d',
-    background: '#F7F9FC',
+    light: {
+    text: '#071A33',
+    background: '#F5F7FA',
     tint: tintColorLight,
-    icon: '#75777e',
-    tabIconDefault: '#75777e',
+    icon: '#6B7A99',
+    tabIconDefault: '#6B7A99',
     tabIconSelected: tintColorLight,
   },
   dark: {
     text: '#F2F4F7',
-    background: '#050B14',
+    background: '#0B1220',
     tint: tintColorDark,
     icon: '#9AA3B2',
     tabIconDefault: '#9AA3B2',
@@ -35,18 +35,18 @@ export const brand = {
 } as const;
 
 export const lightPalette = {
-  background: '#F7F9FC',
+  background: '#F5F7FA',
   surface: '#FFFFFF',
-  surfaceVariant: '#efedf0',
-  surfaceContainer: '#efedf0',
-  surfaceContainerLow: '#f5f3f5',
+  surfaceVariant: '#EEF1F7',
+  surfaceContainer: '#EEF1F7',
+  surfaceContainerLow: '#F5F7FA',
   surfaceLowest: '#FFFFFF',
-  border: '#E2E8F0',
-  borderVariant: '#c5c6ce',
+  border: '#D0D7E5',
+  borderVariant: '#E5EAF3',
 
-  textPrimary: '#1b1b1d',
-  textMuted: '#75777e',
-  textMutedDark: '#44474d',
+  textPrimary: '#071A33',
+  textMuted: '#6B7A99',
+  textMutedDark: '#4A5568',
 
   error: '#ba1a1a',
   errorContainer: '#ffdad6',
@@ -63,16 +63,16 @@ export const lightPalette = {
 
 /** Stitch dark tokens (Login Dark / Secure Modernity) */
 export const darkPalette = {
-  background: '#050B14',
-  surface: '#0B1220',
+  background: '#0B1220',
+  surface: '#151C2C',
   surfaceVariant: '#1E2738',
   surfaceContainer: '#151C2C',
   surfaceContainerLow: '#121826',
   surfaceLowest: '#0B1220',
   border: '#2A3447',
-  borderVariant: '#374151',
+  borderVariant: '#1E2738',
 
-  textPrimary: '#FFFFFF',
+  textPrimary: '#F2F4F7',
   textMuted: '#9AA3B2',
   textMutedDark: '#C5CAD3',
 

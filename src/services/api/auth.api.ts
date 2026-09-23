@@ -1,22 +1,39 @@
 import { apiClient } from './client';
 
-export interface RegisterPayload {
-  email: string;
-  displayName: string;
-  role: 'STUDENT' | 'GUARD' | 'FACULTY' | 'ADMIN';
-}
+export type Role = 'STUDENT' | 'GUARD' | 'FACULTY' | 'ADMIN';
 
 export interface UserProfile {
   id: string;
   firebaseUid: string;
   email: string;
   displayName: string;
-  role: 'STUDENT' | 'GUARD' | 'FACULTY' | 'ADMIN';
+  role: Role;
+  organizationId: string;
   createdAt: string;
 }
 
-/** Provision / fetch a user profile after Firebase sign-in */
+export interface Membership {
+  organizationId: string;
+  organizationName: string;
+  role: Role;
+}
+
+export interface SyncResponse {
+  user: UserProfile;
+  memberships: Membership[];
+}
+
+export interface SyncPayload {
+  displayName: string;
+  role: Role;
+}
+
+/**
+ * Provision / fetch the StuSecure account for the signed-in Firebase
+ * identity. `sync` is called on every auth-state change; `payload` is only
+ * required the first time (no account exists yet — see AppProvider).
+ */
 export const authApi = {
-  getProfile: () => apiClient.get<UserProfile>('/auth/me'),
-  register: (payload: RegisterPayload) => apiClient.post<UserProfile>('/auth/register', payload),
+  sync: (payload?: SyncPayload) => apiClient.post<SyncResponse>('/auth/sync', payload),
+  getMe: () => apiClient.get<UserProfile>('/auth/me'),
 };

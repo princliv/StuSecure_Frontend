@@ -11,7 +11,7 @@ interface AppProviderProps {
 }
 
 function AuthBootstrap({ children }: { children: ReactNode }) {
-  const { setFirebaseUser, setProfile, setLoading } = useAuthStore();
+  const { setFirebaseUser, setProfile, setMemberships, setLoading } = useAuthStore();
   const { setReady } = useAppStore();
 
   useEffect(() => {
@@ -22,14 +22,22 @@ function AuthBootstrap({ children }: { children: ReactNode }) {
         try {
           const token = await firebaseAuth.getIdToken(user);
           setAuthToken(token);
-          const { data } = await authApi.getProfile();
-          setProfile(data);
+          const { data } = await authApi.sync();
+          setProfile(data.user);
+          setMemberships(data.memberships);
         } catch {
+          // No StuSecure account for this identity yet (e.g. mid-registration
+          // — the backend returns 404 until a role is provided). The
+          // registration flow (see app/(auth)/register.tsx TODO) is
+          // responsible for calling authApi.sync({ displayName, role }) to
+          // provision the account.
           setProfile(null);
+          setMemberships([]);
         }
       } else {
         setAuthToken(null);
         setProfile(null);
+        setMemberships([]);
       }
 
       setLoading(false);
@@ -37,7 +45,7 @@ function AuthBootstrap({ children }: { children: ReactNode }) {
     });
 
     return unsubscribe;
-  }, [setFirebaseUser, setProfile, setLoading, setReady]);
+  }, [setFirebaseUser, setProfile, setMemberships, setLoading, setReady]);
 
   return <>{children}</>;
 }
