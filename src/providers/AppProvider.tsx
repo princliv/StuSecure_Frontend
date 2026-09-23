@@ -5,6 +5,7 @@ import { authApi } from '@/services/api/auth.api';
 import { setAuthToken } from '@/services/api/client';
 import { useAuthStore } from '@/store/auth.store';
 import { useAppStore } from '@/store/app.store';
+import { registerDeviceWithBackend } from '@/services/firebase/notifications';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -25,6 +26,7 @@ function AuthBootstrap({ children }: { children: ReactNode }) {
           const { data } = await authApi.sync();
           setProfile(data.user);
           setMemberships(data.memberships);
+          void registerDeviceWithBackend().catch(() => undefined);
         } catch {
           // No StuSecure account for this identity yet (e.g. mid-registration
           // — the backend returns 404 until a role is provided). The

@@ -28,6 +28,19 @@ export default function FacultyDashboard() {
           </Text>
           <Text style={[styles.link, { color: brand.blue }]}>Open inbox</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.card,
+            { backgroundColor: palette.surface, borderColor: palette.border, marginTop: spacing.md },
+          ]}
+          onPress={() => router.push('/(faculty)/alerts')}
+        >
+          <Text style={[styles.cardTitle, { color: palette.textPrimary }]}>Notifications</Text>
+          <Text style={[styles.cardMeta, { color: palette.textMuted }]}>
+            SOS, help, and system alerts for this campus.
+          </Text>
+          <Text style={[styles.link, { color: brand.blue }]}>Open alerts</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

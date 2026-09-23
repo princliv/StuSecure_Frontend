@@ -29,7 +29,13 @@ function formatWhen(iso: string) {
   });
 }
 
-export default function FacultyEmergencyInboxScreen() {
+export default function FacultyEmergencyInboxScreen({
+  canResolve = true,
+  title = 'Emergencies',
+}: {
+  canResolve?: boolean;
+  title?: string;
+} = {}) {
   const { palette, brand, statusBarStyle } = useTheme();
   const orgId = useAuthStore((s) => s.activeOrganizationId ?? s.memberships[0]?.organizationId);
   const [items, setItems] = useState<Emergency[]>([]);
@@ -104,7 +110,7 @@ export default function FacultyEmergencyInboxScreen() {
       <StatusBar barStyle={statusBarStyle} backgroundColor={palette.background} />
       <View style={styles.header}>
         <BrandLogo height={22} />
-        <Text style={[styles.title, { color: palette.textPrimary }]}>Emergencies</Text>
+        <Text style={[styles.title, { color: palette.textPrimary }]}>{title}</Text>
       </View>
       <ScrollView
         contentContainerStyle={styles.content}
@@ -174,13 +180,15 @@ export default function FacultyEmergencyInboxScreen() {
                         <Text style={[styles.btnText, { color: brand.blue }]}>Acknowledge</Text>
                       </TouchableOpacity>
                     ) : null}
-                    <TouchableOpacity
-                      style={[styles.btn, { backgroundColor: brand.blue, borderColor: brand.blue }]}
-                      onPress={() => void onResolve(item.id)}
-                      disabled={busyId === item.id}
-                    >
-                      <Text style={[styles.btnText, { color: '#fff' }]}>Resolve</Text>
-                    </TouchableOpacity>
+                    {canResolve ? (
+                      <TouchableOpacity
+                        style={[styles.btn, { backgroundColor: brand.blue, borderColor: brand.blue }]}
+                        onPress={() => void onResolve(item.id)}
+                        disabled={busyId === item.id}
+                      >
+                        <Text style={[styles.btnText, { color: '#fff' }]}>Resolve</Text>
+                      </TouchableOpacity>
+                    ) : null}
                   </View>
                 ) : null}
               </View>

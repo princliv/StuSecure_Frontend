@@ -12,7 +12,7 @@
  * Full dark-mode support via useTheme().
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -22,9 +22,11 @@ import {
   StyleSheet,
   Animated,
   StatusBar,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 import { brand } from '@/theme/colors';
 import type { AppPalette } from '@/theme/colors';
@@ -32,75 +34,70 @@ import { radius } from '@/theme/radius';
 import { spacing } from '@/theme/spacing';
 import BrandLogo from '@/components/ui/BrandLogo';
 import StudentAvatar from '@/components/ui/StudentAvatar';
-
-// ─── Constants ───────────────────────────────────────────────────────────────
+import { monitoringApi } from '@/services/api/monitoring.api';
+import type { MovementLog } from '@/services/api/movement.api';
+import type { Emergency } from '@/services/api/emergency.api';
+import { connectSocket, getSocket } from '@/services/socket/socket';
+import { auth } from '@/services/firebase/auth';
+import { useAuthStore } from '@/store/auth.store';
 
 const SIDE = 20;
 
-// ─── Mock data ───────────────────────────────────────────────────────────────
+function initialsFromName(name?: string | null) {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'FA';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
-const MOCK_INSIDE = 420;
-const MOCK_OUTSIDE = 80;
-const MOCK_ALERTS_COUNT = 5;
-const MOCK_ALERT_SUMMARY = '2 Curfew Violations, 3 Suspicious Activity.';
+function relativeTime(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.max(0, Math.floor(diff / 60_000));
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
 
-const BLOCKS = ['All Blocks', 'Hostel Block A', 'Hostel Block B', 'Hostel Block C'];
-
-type MovementType = 'check-in' | 'check-out' | 'late-entry';
+type FeedKind = 'check-in' | 'check-out' | 'emergency';
 
 interface MovementItem {
   id: string;
-  type: MovementType;
+  type: FeedKind;
   name: string;
   rollNo: string;
   time: string;
   gate: string;
+  hostelName: string | null;
   badge?: string;
 }
 
-const MOCK_FEED: MovementItem[] = [
-  {
-    id: '1',
-    type: 'check-in',
-    name: 'Rahul Sharma',
-    rollNo: '21BCE045',
-    time: 'Just now',
-    gate: 'Main Gate',
-  },
-  {
-    id: '2',
-    type: 'check-out',
-    name: 'Priya Patel',
-    rollNo: '22BME112',
-    time: '2m ago',
-    gate: 'North Gate',
-  },
-  {
-    id: '3',
-    type: 'late-entry',
-    name: 'Arjun Singh',
-    rollNo: '20BEE089',
-    time: '15m ago',
-    gate: 'Hostel Block C',
-    badge: 'Late Entry',
-  },
-  {
-    id: '4',
-    type: 'check-in',
-    name: 'Sneha Reddy',
-    rollNo: '23BCS201',
-    time: '22m ago',
-    gate: 'East Gate',
-  },
-  {
-    id: '5',
-    type: 'check-out',
-    name: 'Kiran Mehta',
-    rollNo: '21BME077',
-    time: '31m ago',
-    gate: 'Main Gate',
-  },
-];
+function logToItem(log: MovementLog): MovementItem {
+  const isIn = log.type === 'CHECK_IN';
+  return {
+    id: log.id,
+    type: isIn ? 'check-in' : 'check-out',
+    name: log.student.name,
+    rollNo: log.student.enrollmentNo,
+    time: relativeTime(log.timestamp),
+    gate: log.location ?? log.student.hostelName ?? 'Gate',
+    hostelName: log.student.hostelName,
+  };
+}
+
+function emergencyToItem(row: Emergency): MovementItem {
+  return {
+    id: `sos-${row.id}`,
+    type: 'emergency',
+    name: row.reportedBy.name,
+    rollNo: row.reportedBy.enrollmentNo,
+    time: relativeTime(row.createdAt),
+    gate: row.location ?? row.reportedBy.hostelName ?? 'Campus',
+    hostelName: row.reportedBy.hostelName,
+    badge: row.status === 'ACTIVE' ? 'SOS' : row.status,
+  };
+}
 
 // ─── Pulsing "Live" dot ───────────────────────────────────────────────────────
 
@@ -156,7 +153,7 @@ function FeedItem({
 }) {
   const { palette } = useTheme();
   const isIn = item.type === 'check-in';
-  const isLate = item.type === 'late-entry';
+  const isLate = item.type === 'emergency';
 
   const iconBg = isIn
     ? `${brand.blue}1A`
@@ -167,14 +164,14 @@ function FeedItem({
   const iconName: React.ComponentProps<typeof MaterialIcons>['name'] = isIn
     ? 'login'
     : isLate
-    ? 'timer-off'
+    ? 'warning'
     : 'logout';
   const gateIcon: React.ComponentProps<typeof MaterialIcons>['name'] = isIn
     ? 'door-front'
     : isLate
-    ? 'door-front'
+    ? 'emergency'
     : 'directions-bus';
-  const action = isIn ? 'Checked In' : 'Checked Out';
+  const action = isIn ? 'Checked In' : isLate ? 'SOS' : 'Checked Out';
 
   return (
     <View style={[feedStyles.row, isLate && { backgroundColor: 'rgba(186,26,26,0.04)' }]}>
@@ -281,16 +278,88 @@ const feedStyles = StyleSheet.create({
 export default function LiveMonitoringScreen() {
   const { palette, statusBarStyle } = useTheme();
   const styles = makeStyles(palette);
+  const router = useRouter();
+  const profile = useAuthStore((s) => s.profile);
+  const orgId = useAuthStore((s) => s.activeOrganizationId ?? s.memberships[0]?.organizationId);
+
   const [selectedBlock, setSelectedBlock] = useState('All Blocks');
   const [searchQuery, setSearchQuery] = useState('');
+  const [blocks, setBlocks] = useState<string[]>(['All Blocks']);
+  const [inside, setInside] = useState(0);
+  const [outside, setOutside] = useState(0);
+  const [alertCount, setAlertCount] = useState(0);
+  const [alertSummary, setAlertSummary] = useState('');
+  const [feed, setFeed] = useState<MovementItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredFeed = MOCK_FEED.filter((item) => {
+  const load = useCallback(async () => {
+    try {
+      const { data } = await monitoringApi.snapshot();
+      setInside(data.insideCount);
+      setOutside(data.outsideCount);
+      setAlertCount(data.openEmergencyCount);
+      setAlertSummary(
+        data.alertSummary
+          ? `${data.openEmergencyCount} open · ${data.alertSummary}`
+          : 'No open emergencies.',
+      );
+      setBlocks(['All Blocks', ...data.hostels.map((h) => h.name)]);
+      setFeed(data.movements.map(logToItem));
+    } catch {
+      setAlertSummary('Could not load live data.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+      let socket: ReturnType<typeof getSocket> | null = null;
+      const user = auth.currentUser;
+      (async () => {
+        if (!user || !orgId) return;
+        const token = await user.getIdToken();
+        socket = connectSocket(token, orgId);
+        socket.on('movement:created', (row: MovementLog) => {
+          setFeed((prev) => {
+            const next = [logToItem(row), ...prev.filter((i) => i.id !== row.id)];
+            return next.slice(0, 50);
+          });
+          setInside((n) => Math.max(0, n + (row.type === 'CHECK_IN' ? 1 : -1)));
+          setOutside((n) => Math.max(0, n + (row.type === 'CHECK_OUT' ? 1 : -1)));
+        });
+        socket.on('emergency:created', (row: Emergency) => {
+          setFeed((prev) => [emergencyToItem(row), ...prev].slice(0, 50));
+          setAlertCount((n) => n + 1);
+          setAlertSummary((s) => `${row.reportedBy.name}${s ? ` · ${s}` : ''}`);
+        });
+        socket.on('emergency:updated', (row: Emergency) => {
+          const open = row.status === 'ACTIVE' || row.status === 'ACKNOWLEDGED';
+          setFeed((prev) => {
+            const mapped = emergencyToItem(row);
+            const rest = prev.filter((i) => i.id !== mapped.id);
+            return open ? [mapped, ...rest] : rest;
+          });
+          if (!open) {
+            setAlertCount((n) => Math.max(0, n - 1));
+          }
+        });
+      })();
+
+      return () => {
+        socket?.off('movement:created');
+        socket?.off('emergency:created');
+        socket?.off('emergency:updated');
+      };
+    }, [load, orgId]),
+  );
+
+  const filteredFeed = feed.filter((item) => {
+    if (selectedBlock !== 'All Blocks' && item.hostelName !== selectedBlock) return false;
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
-    return (
-      item.name.toLowerCase().includes(q) ||
-      item.rollNo.toLowerCase().includes(q)
-    );
+    return item.name.toLowerCase().includes(q) || item.rollNo.toLowerCase().includes(q);
   });
 
   return (
@@ -303,8 +372,7 @@ export default function LiveMonitoringScreen() {
           <BrandLogo height={22} />
           <Text style={styles.headerTitle}>Faculty Monitoring</Text>
         </View>
-        {/* Faculty avatar — FA initials */}
-        <StudentAvatar size={36} useHeadshot={false} initials="FA" />
+        <StudentAvatar size={36} useHeadshot={false} initials={initialsFromName(profile?.displayName)} />
       </View>
 
       <ScrollView
@@ -312,6 +380,9 @@ export default function LiveMonitoringScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={() => void load()} tintColor={brand.blue} />
+        }
       >
         {/* ── Status cards (2-up grid) ───────────────────────────────────── */}
         <View style={styles.statusGrid}>
@@ -323,39 +394,45 @@ export default function LiveMonitoringScreen() {
                 <Text style={styles.livePillText}>Live</Text>
               </View>
             </View>
-            <Text style={styles.statusCount}>{MOCK_INSIDE}</Text>
+            <Text style={styles.statusCount}>{inside}</Text>
             <Text style={styles.statusLabel}>Students Inside</Text>
           </View>
 
           <View style={[styles.statusCard, styles.statusCardHalf]}>
             <View style={styles.statusCardTop}>
               <MaterialIcons name="directions-walk" size={20} color={palette.textMuted} />
-              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalLabel}>Outside</Text>
             </View>
-            <Text style={styles.statusCount}>{MOCK_OUTSIDE}</Text>
+            <Text style={styles.statusCount}>{outside}</Text>
             <Text style={styles.statusLabel}>Students Outside</Text>
           </View>
         </View>
 
         {/* ── Emergency alert banner ─────────────────────────────────────── */}
-        <View style={styles.alertBanner}>
-          <View style={styles.alertIconWrap}>
-            <MaterialIcons name="warning" size={24} color={palette.error} />
-          </View>
-          <View style={styles.alertBody}>
-            <View style={styles.alertTopRow}>
-              <Text style={styles.alertTitle}>{MOCK_ALERTS_COUNT} Alerts Pending</Text>
-              <Text style={styles.alertRequired}>Action Required</Text>
+        {alertCount > 0 ? (
+          <View style={styles.alertBanner}>
+            <View style={styles.alertIconWrap}>
+              <MaterialIcons name="warning" size={24} color={palette.error} />
             </View>
-            <Text style={styles.alertSummary} numberOfLines={1}>
-              {MOCK_ALERT_SUMMARY}
-            </Text>
-            <TouchableOpacity activeOpacity={0.7} style={styles.viewAllBtn}>
-              <Text style={styles.viewAllText}>View All</Text>
-              <MaterialIcons name="arrow-forward" size={14} color={palette.error} />
-            </TouchableOpacity>
+            <View style={styles.alertBody}>
+              <View style={styles.alertTopRow}>
+                <Text style={styles.alertTitle}>{alertCount} Alerts Pending</Text>
+                <Text style={styles.alertRequired}>Action Required</Text>
+              </View>
+              <Text style={styles.alertSummary} numberOfLines={1}>
+                {alertSummary}
+              </Text>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.viewAllBtn}
+                onPress={() => router.push('/(faculty)/emergency')}
+              >
+                <Text style={styles.viewAllText}>View All</Text>
+                <MaterialIcons name="arrow-forward" size={14} color={palette.error} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        ) : null}
 
         {/* ── Block filter chips ─────────────────────────────────────────── */}
         <ScrollView
@@ -364,7 +441,7 @@ export default function LiveMonitoringScreen() {
           contentContainerStyle={styles.chipScrollContent}
           style={styles.chipScroll}
         >
-          {BLOCKS.map((block) => {
+          {blocks.map((block) => {
             const active = selectedBlock === block;
             return (
               <TouchableOpacity
@@ -400,9 +477,6 @@ export default function LiveMonitoringScreen() {
             onChangeText={setSearchQuery}
             returnKeyType="search"
           />
-          <TouchableOpacity activeOpacity={0.7} style={styles.filterBtn}>
-            <MaterialIcons name="tune" size={20} color={palette.textMuted} />
-          </TouchableOpacity>
         </View>
 
         {/* ── Live Movement feed ────────────────────────────────────────── */}
@@ -415,7 +489,9 @@ export default function LiveMonitoringScreen() {
             {filteredFeed.length === 0 ? (
               <View style={styles.emptyWrap}>
                 <MaterialIcons name="search-off" size={32} color={palette.textMuted} />
-                <Text style={styles.emptyText}>No results found</Text>
+                <Text style={styles.emptyText}>
+                  {loading ? 'Loading…' : 'No live activity yet'}
+                </Text>
               </View>
             ) : (
               filteredFeed.map((item, idx) => (
@@ -436,8 +512,9 @@ export default function LiveMonitoringScreen() {
       <TouchableOpacity
         activeOpacity={0.85}
         style={styles.fab}
-        accessibilityLabel="Trigger Emergency"
+        accessibilityLabel="Open emergencies"
         accessibilityRole="button"
+        onPress={() => router.push('/(faculty)/emergency')}
       >
         <MaterialIcons name="emergency" size={30} color="#fff" />
       </TouchableOpacity>

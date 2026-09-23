@@ -113,6 +113,7 @@ export default function FacultyLayout() {
       <Tabs.Screen name="attendance" options={{ href: null }} />
       <Tabs.Screen name="guards" options={{ href: null }} />
       <Tabs.Screen name="help-requests" options={{ href: null }} />
+      <Tabs.Screen name="alerts" options={{ href: null }} />
       <Tabs.Screen name="reports" options={{ href: null }} />
     </Tabs>
   );
