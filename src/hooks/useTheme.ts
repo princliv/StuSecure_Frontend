@@ -8,7 +8,7 @@ import {
 } from '@/theme/colors';
 
 export function useTheme() {
-  const scheme = useColorScheme() ?? 'light';
+  const scheme = useColorScheme() === 'dark' ? 'dark' : 'light';
   const isDark = scheme === 'dark';
 
   return {

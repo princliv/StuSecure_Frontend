@@ -726,7 +726,7 @@ function makeStyles(palette: AppPalette) {
 
     // ── Active alert overlay
     activeOverlay: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       backgroundColor: palette.surface,
       zIndex: 90,
     },

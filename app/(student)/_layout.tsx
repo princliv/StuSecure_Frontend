@@ -10,6 +10,7 @@
 import { useEffect } from 'react';
 import { Tabs, router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import type { ColorValue } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { HapticTab } from '@/components/navigation/haptic-tab';
 import { useAuthStore } from '@/store/auth.store';
@@ -18,7 +19,7 @@ import { routeByMembership } from '@/features/auth/routeByMembership';
 type MAIconName = React.ComponentProps<typeof MaterialIcons>['name'];
 
 function tabIcon(name: MAIconName) {
-  return ({ color }: { color: string }) => (
+  return ({ color }: { color: ColorValue }) => (
     <MaterialIcons name={name} size={24} color={color} />
   );
 }
