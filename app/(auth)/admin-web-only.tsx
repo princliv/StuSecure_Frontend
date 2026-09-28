@@ -53,7 +53,7 @@ export default function AdminWebOnlyScreen() {
 
           <View style={styles.urlRow}>
             <MaterialIcons name="open-in-new" size={14} color={palette.textMuted} />
-            <Text style={styles.urlText}>admin.stusecure.app</Text>
+            <Text style={styles.urlText}>http://localhost:5173</Text>
           </View>
         </View>
 

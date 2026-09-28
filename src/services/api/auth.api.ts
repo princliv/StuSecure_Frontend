@@ -7,8 +7,6 @@ export interface UserProfile {
   firebaseUid: string;
   email: string;
   displayName: string;
-  role: Role;
-  organizationId: string;
   createdAt: string;
 }
 
