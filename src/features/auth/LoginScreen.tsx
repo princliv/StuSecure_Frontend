@@ -21,6 +21,7 @@ import {
   ScrollView,
   Platform,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
@@ -48,6 +49,7 @@ import BrandLogo from '@/components/ui/BrandLogo';
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
+  organization: z.string().trim().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -91,7 +93,7 @@ export default function LoginScreen() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: '', password: '', organization: '' },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -111,6 +113,29 @@ export default function LoginScreen() {
 
       // 3. Route by membership.
       const mems = syncData.memberships;
+      const typedOrg = data.organization?.trim();
+
+      if (typedOrg) {
+        const lower = typedOrg.toLowerCase();
+        const matches = mems.filter(
+          (m) =>
+            m.organizationSlug === typedOrg ||
+            m.organizationId === typedOrg ||
+            m.organizationName.toLowerCase() === lower,
+        );
+
+        if (matches.length === 1) {
+          selectOrg(matches[0]);
+          routeByMembership(matches[0]);
+          return;
+        }
+
+        setGlobalError(
+          'No membership found for that Organization ID — check with your admin, or leave it blank to choose from a list.',
+        );
+        return;
+      }
+
       if (mems.length === 0) {
         setGlobalError('No organization found for your account. Contact your admin.');
         return;
@@ -229,6 +254,29 @@ export default function LoginScreen() {
               />
             </View>
 
+            {/* Organization ID (optional) */}
+            <Controller
+              control={control}
+              name="organization"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextField
+                  label="Organization ID (optional)"
+                  placeholder="e.g. demo-organization-a1b2c3"
+                  leftIconName="business"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  returnKeyType="done"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  error={errors.organization?.message}
+                />
+              )}
+            />
+            <Text style={styles.helperText}>
+              Organization ID (optional) — leave blank to choose from a list.
+            </Text>
+
             {/* Remember me */}
             <TouchableOpacity
               style={styles.rememberRow}
@@ -269,8 +317,12 @@ export default function LoginScreen() {
               rightElement={
                 <MaterialIcons name="account-balance" size={18} color={palette.textMutedDark} />
               }
-              // TODO: implement institutional SSO flow
-              onPress={() => {}}
+              onPress={() =>
+                Alert.alert(
+                  'Coming soon',
+                  'Institutional sign-in is not available yet. Please sign in with your email and password.',
+                )
+              }
             />
           </View>
 
@@ -409,6 +461,14 @@ function makeStyles(palette: AppPalette) {
       fontWeight: '500',
       color: brand.blue,
       fontFamily: 'Inter_500Medium',
+    },
+
+    helperText: {
+      fontSize: 12,
+      color: palette.textMuted,
+      marginTop: -spacing.xs,
+      marginLeft: 2,
+      fontFamily: 'Inter_400Regular',
     },
 
     // ── Remember me ───────────────────────────────────────────────────────────

@@ -16,6 +16,7 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -30,8 +31,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { switchOrg } from '@/features/auth/orgs.api';
 import type { Membership } from '@/features/auth/orgs.api';
 import { routeByMembership } from '@/features/auth/routeByMembership';
-import { firebaseAuth } from '@/services/firebase/auth';
-import { setAuthToken } from '@/services/api/client';
+import { performSignOut } from '@/features/auth/signOut';
 
 const ROLE_ICON: Record<string, React.ComponentProps<typeof MaterialIcons>['name']> = {
   STUDENT: 'school',
@@ -44,7 +44,7 @@ export default function SelectOrgScreen() {
   const { palette, statusBarStyle } = useTheme();
   const styles = makeStyles(palette);
 
-  const { memberships, selectOrg, reset } = useAuthStore();
+  const { memberships, selectOrg } = useAuthStore();
   const [switching, setSwitching] = useState<string | null>(null); // orgId being switched
   const [error, setError] = useState<string | null>(null);
 
@@ -62,10 +62,11 @@ export default function SelectOrgScreen() {
     }
   };
 
-  const handleLogout = async () => {
-    await firebaseAuth.signOut();
-    setAuthToken(null);
-    reset();
+  const handleLogout = () => {
+    Alert.alert('Sign out?', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Sign Out', style: 'destructive', onPress: () => void performSignOut() },
+    ]);
   };
 
   return (

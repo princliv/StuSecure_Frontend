@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
@@ -14,19 +14,17 @@ import { radius } from '@/theme/radius';
 import { spacing } from '@/theme/spacing';
 import BrandLogo from '@/components/ui/BrandLogo';
 import Button from '@/components/ui/Button';
-import { useAuthStore } from '@/store/auth.store';
-import { firebaseAuth } from '@/services/firebase/auth';
-import { setAuthToken } from '@/services/api/client';
+import { performSignOut } from '@/features/auth/signOut';
 
 export default function AdminWebOnlyScreen() {
   const { palette, statusBarStyle } = useTheme();
   const styles = makeStyles(palette);
-  const { reset } = useAuthStore();
 
-  const handleLogout = async () => {
-    await firebaseAuth.signOut();
-    setAuthToken(null);
-    reset();
+  const handleLogout = () => {
+    Alert.alert('Sign out?', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Sign Out', style: 'destructive', onPress: () => void performSignOut() },
+    ]);
   };
 
   return (
