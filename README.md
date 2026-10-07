@@ -10,7 +10,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web-3DDC84)]()
 [![Status](https://img.shields.io/badge/Status-Completed-brightgreen)]()
 
-[Master README](../README.md) • [Features](#features) • [Mobile Personas](#mobile-personas) • [Tech Stack](#tech-stack) • [Getting Started](#getting-started) • [Branding & Assets](#branding--assets)
+[Master README](../README.md) • [Features](#features) • [Mobile Personas](#mobile-personas) • [Tech Stack](#tech-stack) • [Getting Started](#getting-started) • [Branding & Assets](#branding--assets) • [Screenshots](#screenshots)
 
 </div>
 
@@ -141,6 +141,36 @@ The mobile app includes transparent SVG and PNG brand assets in `assets/images/`
 - `app-icon-light.png` — 1:1 Icon for Light Theme
 - `app-logo-with-name-dark.png` — Horizontal lockup with name for Dark Theme
 - `app-logo-with-name-light.png` — Horizontal lockup with name for Light Theme
+
+---
+
+## Screenshots
+
+<div align="center">
+
+### Student Experience
+
+| Login & Authentication | Student Home Dashboard | Dynamic TOTP QR Pass |
+|:---:|:---:|:---:|
+| <img src="assets/screenshots/1.jpeg" width="220"/> | <img src="assets/screenshots/2.jpeg" width="220"/> | <img src="assets/screenshots/3.jpeg" width="220"/> |
+
+| Emergency SOS Beacon | Student Profile & Credentials |
+|:---:|:---:|
+| <img src="assets/screenshots/4.jpeg" width="220"/> | <img src="assets/screenshots/5.jpeg" width="220"/> |
+
+### Faculty & Warden Management
+
+| Live Campus Monitoring | Operations Dashboard |
+|:---:|:---:|
+| <img src="assets/screenshots/6.jpeg" width="220"/> | <img src="assets/screenshots/7.jpeg" width="220"/> |
+
+### Security Personnel & Checkpoints
+
+| Guard Dashboard | Camera QR Scanner | Manual Token Verification |
+|:---:|:---:|:---:|
+| <img src="assets/screenshots/8.jpeg" width="220"/> | <img src="assets/screenshots/9.jpeg" width="220"/> | <img src="assets/screenshots/10.jpeg" width="220"/> |
+
+</div>
 
 ---
 
