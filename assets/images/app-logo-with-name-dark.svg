@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" width="880" height="240">
+  <defs>
+    <linearGradient id="hDarkRim" x1="10%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="30%" stop-color="#2563EB"/>
+      <stop offset="70%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#00D2FF"/>
+    </linearGradient>
+
+    <linearGradient id="hDarkLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A5F"/>
+      <stop offset="100%" stop-color="#0F243E"/>
+    </linearGradient>
+
+    <linearGradient id="hDarkRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="70%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#173B70"/>
+    </linearGradient>
+
+    <linearGradient id="hDarkCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#E0F2FE"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+
+    <linearGradient id="textSecureDark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#60A5FA"/>
+    </linearGradient>
+
+    <filter id="hDarkGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0284C7" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Symbol on Left: Scaled to ~180px height -->
+  <g transform="translate(10, 8) scale(0.48)" filter="url(#hDarkGlow)">
+    <path d="M 256 40
+             C 344 40, 408 60, 424 90
+             C 430 178, 420 296, 256 424
+             C 92 296, 82 178, 88 90
+             C 104 60, 168 40, 256 40 Z"
+          fill="none" stroke="url(#hDarkRim)" stroke-width="20" stroke-linejoin="round"/>
+
+    <path d="M 256 56
+             L 102 96
+             C 97 172, 107 278, 256 406
+             L 256 56 Z"
+          fill="url(#hDarkLeft)"/>
+
+    <path d="M 256 56
+             L 410 96
+             C 415 172, 405 278, 256 406
+             L 256 56 Z"
+          fill="url(#hDarkRight)"/>
+
+    <line x1="256" y1="56" x2="256" y2="406" stroke="#38BDF8" stroke-width="3" opacity="0.6"/>
+
+    <path d="M 194 150
+             C 194 124, 222 112, 256 112
+             C 290 112, 320 128, 320 158
+             C 320 188, 282 202, 252 216
+             C 218 232, 192 248, 192 294
+             C 192 334, 222 352, 256 352
+             C 290 352, 318 336, 324 320"
+          fill="none" stroke="url(#hDarkCore)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <circle cx="256" cy="224" r="32" fill="#0C1F38" stroke="url(#hDarkRim)" stroke-width="5"/>
+    <circle cx="256" cy="224" r="16" fill="url(#hDarkCore)"/>
+    <circle cx="256" cy="224" r="7" fill="#071326"/>
+    <line x1="256" y1="240" x2="256" y2="274" stroke="#38BDF8" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Typography on Right (NO background box) -->
+  <g transform="translate(250, 138)">
+    <text font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+          font-size="82" font-weight="800" letter-spacing="-1.5">
+      <tspan fill="#F2F4F7">Stu</tspan><tspan fill="url(#textSecureDark)">Secure</tspan>
+    </text>
+  </g>
+
+  <!-- Pure Transparent Tagline (NO rect background) -->
+  <g transform="translate(254, 182)">
+    <circle cx="8" cy="0" r="5" fill="#38BDF8"/>
+    <text x="24" y="4" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#9AA3B2" letter-spacing="2.8">
+      CAMPUS SAFETY
+    </text>
+  </g>
+</svg>

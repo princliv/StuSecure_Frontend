@@ -62,7 +62,7 @@ export default function FacultyAttendanceScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: palette.background }]} edges={['top']}>
       <StatusBar barStyle={statusBarStyle} backgroundColor={palette.background} />
       <View style={styles.header}>
-        <BrandLogo height={22} />
+        <BrandLogo variant="icon" size={26} />
         <Text style={[styles.title, { color: palette.textPrimary }]}>Attendance</Text>
       </View>
       <View style={styles.chips}>

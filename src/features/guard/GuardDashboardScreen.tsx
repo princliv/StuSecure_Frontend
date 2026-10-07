@@ -88,7 +88,16 @@ const MOCK_RECENT_SCANS: RecentScan[] = [
 function AlertBanner({ onDismiss }: { onDismiss: () => void }) {
   const { palette } = useTheme();
   return (
-    <View style={[alertBannerStyles.container, { backgroundColor: palette.errorContainer }]}>
+    <View
+      style={[
+        alertBannerStyles.container,
+        {
+          backgroundColor: palette.errorContainer,
+          borderColor: `${palette.error}55`,
+          borderWidth: 1,
+        },
+      ]}
+    >
       <MaterialIcons name="warning" size={22} color={palette.error} style={alertBannerStyles.icon} />
       <View style={alertBannerStyles.body}>
         <Text style={[alertBannerStyles.title, { color: palette.onErrorContainer }]}>
@@ -139,7 +148,7 @@ const alertBannerStyles = StyleSheet.create({
 });
 
 function ShiftRow() {
-  const { palette } = useTheme();
+  const { palette, isDark } = useTheme();
   return (
     <View style={[shiftRowStyles.row]}>
       <View>
@@ -153,9 +162,20 @@ function ShiftRow() {
           </Text>
         </View>
       </View>
-      <View style={[shiftRowStyles.badge, { backgroundColor: brand.navy }]}>
-        <View style={shiftRowStyles.dot} />
-        <Text style={shiftRowStyles.badgeLabel}>On Duty</Text>
+      <View
+        style={[
+          shiftRowStyles.badge,
+          {
+            backgroundColor: isDark ? 'rgba(52, 211, 153, 0.15)' : palette.successContainer,
+            borderColor: isDark ? 'rgba(52, 211, 153, 0.35)' : '#C6F6D5',
+            borderWidth: 1,
+          },
+        ]}
+      >
+        <View style={[shiftRowStyles.dot, { backgroundColor: palette.success }]} />
+        <Text style={[shiftRowStyles.badgeLabel, { color: isDark ? '#6EE7B7' : palette.successText }]}>
+          On Duty
+        </Text>
       </View>
     </View>
   );
@@ -195,13 +215,11 @@ const shiftRowStyles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#4CAF50',
   },
   badgeLabel: {
     fontSize: 12,
-    fontWeight: '500',
-    color: '#b6c7e8',
-    fontFamily: 'Inter_500Medium',
+    fontWeight: '600',
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 
@@ -270,49 +288,102 @@ const scanBtnStyles = StyleSheet.create({
 });
 
 function StatsGrid() {
-  const { palette } = useTheme();
+  const { palette, brand, isDark } = useTheme();
   return (
     <View style={statsStyles.grid}>
       {/* Hero stat — Students Inside */}
-      <View style={[statsStyles.card, statsStyles.cardHero, { backgroundColor: palette.surfaceVariant }]}>
+      <View
+        style={[
+          statsStyles.card,
+          statsStyles.cardHero,
+          {
+            backgroundColor: palette.surface,
+            borderColor: palette.border,
+            borderWidth: 1,
+          },
+        ]}
+      >
         <View style={statsStyles.heroLeft}>
           <Text style={[statsStyles.label, { color: palette.textMuted }]}>STUDENTS INSIDE</Text>
           <View style={statsStyles.heroValueRow}>
-            <Text style={[statsStyles.heroNumber, { color: brand.navy }]}>
+            <Text style={[statsStyles.heroNumber, { color: palette.textPrimary }]}>
               {MOCK_STATS.studentsInside}
             </Text>
-            <Text style={[statsStyles.heroDelta, { color: brand.blue }]}>
-              {MOCK_STATS.deltaThisHour}
-            </Text>
+            <View
+              style={[
+                statsStyles.deltaBadge,
+                {
+                  backgroundColor: isDark ? 'rgba(56, 189, 248, 0.15)' : 'rgba(21, 94, 239, 0.08)',
+                  borderColor: isDark ? 'rgba(56, 189, 248, 0.3)' : 'rgba(21, 94, 239, 0.18)',
+                },
+              ]}
+            >
+              <Text style={[statsStyles.heroDelta, { color: isDark ? '#38BDF8' : brand.blue }]}>
+                {MOCK_STATS.deltaThisHour}
+              </Text>
+            </View>
           </View>
         </View>
-        <View style={[statsStyles.heroIcon, { backgroundColor: `${brand.blue}12` }]}>
-          <MaterialIcons name="groups" size={28} color={brand.blue} />
+        <View
+          style={[
+            statsStyles.heroIcon,
+            {
+              backgroundColor: isDark ? 'rgba(56, 189, 248, 0.12)' : `${brand.blue}12`,
+              borderColor: isDark ? 'rgba(56, 189, 248, 0.25)' : `${brand.blue}20`,
+              borderWidth: 1,
+            },
+          ]}
+        >
+          <MaterialIcons name="groups" size={28} color={isDark ? '#38BDF8' : brand.blue} />
         </View>
       </View>
 
       {/* Check-ins */}
-      <View style={[statsStyles.card, statsStyles.cardHalf, { backgroundColor: palette.surfaceVariant }]}>
+      <View
+        style={[
+          statsStyles.card,
+          statsStyles.cardHalf,
+          {
+            backgroundColor: palette.surface,
+            borderColor: palette.border,
+            borderWidth: 1,
+          },
+        ]}
+      >
         <MaterialIcons
           name="login"
           size={20}
-          color={`${brand.blue}80`}
+          color={isDark ? '#34D399' : brand.blue}
           style={statsStyles.halfIcon}
         />
         <Text style={[statsStyles.label, { color: palette.textMuted }]}>Check-ins</Text>
-        <Text style={[statsStyles.halfNumber, { color: brand.navy }]}>{MOCK_STATS.checkIns}</Text>
+        <Text style={[statsStyles.halfNumber, { color: palette.textPrimary }]}>
+          {MOCK_STATS.checkIns}
+        </Text>
       </View>
 
       {/* Check-outs */}
-      <View style={[statsStyles.card, statsStyles.cardHalf, { backgroundColor: palette.surfaceVariant }]}>
+      <View
+        style={[
+          statsStyles.card,
+          statsStyles.cardHalf,
+          {
+            backgroundColor: palette.surface,
+            borderColor: palette.border,
+            borderWidth: 1,
+          },
+        ]}
+      >
         <MaterialIcons
           name="logout"
           size={20}
-          color={`${palette.textMuted}99`}
+          color={palette.textMuted}
           style={statsStyles.halfIcon}
         />
         <Text style={[statsStyles.label, { color: palette.textMuted }]}>Check-outs</Text>
-        <Text style={[statsStyles.halfNumber, { color: brand.navy }]}>{MOCK_STATS.checkOuts}</Text>
+        <Text style={[statsStyles.halfNumber, { color: palette.textPrimary }]}>
+          {MOCK_STATS.checkOuts}
+        </Text>
       </View>
     </View>
   );
@@ -386,6 +457,12 @@ const statsStyles = StyleSheet.create({
     letterSpacing: 0.6,
     marginBottom: 2,
   },
+  deltaBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+    borderWidth: 1,
+  },
   halfNumber: {
     fontSize: 28,
     fontWeight: '700',
@@ -395,7 +472,7 @@ const statsStyles = StyleSheet.create({
 });
 
 function ScanItem({ scan, isLast }: { scan: RecentScan; isLast: boolean }) {
-  const { palette } = useTheme();
+  const { palette, isDark } = useTheme();
   const isGranted = scan.status === 'granted';
 
   return (
@@ -403,21 +480,36 @@ function ScanItem({ scan, isLast }: { scan: RecentScan; isLast: boolean }) {
       <View
         style={[
           scanItemStyles.iconWrap,
-          isGranted ? scanItemStyles.iconWrapSuccess : { backgroundColor: palette.errorContainer },
+          isGranted
+            ? {
+                backgroundColor: isDark ? 'rgba(52, 211, 153, 0.15)' : palette.successContainer,
+                borderColor: isDark ? 'rgba(52, 211, 153, 0.35)' : '#C6F6D5',
+              }
+            : {
+                backgroundColor: isDark ? 'rgba(255, 138, 128, 0.15)' : palette.errorContainer,
+                borderColor: `${palette.error}44`,
+              },
         ]}
       >
         <MaterialIcons
           name={isGranted ? 'check-circle' : 'cancel'}
           size={24}
-          color={isGranted ? '#137333' : palette.error}
+          color={isGranted ? (isDark ? '#34D399' : '#047857') : palette.error}
         />
       </View>
 
       <View
         style={[
           scanItemStyles.content,
-          { backgroundColor: palette.surface },
-          !isGranted && { backgroundColor: `${palette.errorContainer}55` },
+          {
+            backgroundColor: palette.surface,
+            borderColor: palette.border,
+            borderWidth: 1,
+          },
+          !isGranted && {
+            borderColor: `${palette.error}44`,
+            backgroundColor: isDark ? 'rgba(74, 21, 21, 0.3)' : `${palette.errorContainer}44`,
+          },
           isLast && scanItemStyles.contentLast,
         ]}
       >
@@ -455,10 +547,6 @@ const scanItemStyles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-  },
-  iconWrapSuccess: {
-    backgroundColor: '#E6F4EA',
   },
   content: {
     flex: 1,
@@ -507,7 +595,7 @@ function RecentScans() {
       </View>
 
       <View style={recentScansStyles.list}>
-        <View style={[recentScansStyles.timelineBar, { borderLeftColor: palette.surfaceVariant }]} />
+        <View style={[recentScansStyles.timelineBar, { borderLeftColor: palette.border }]} />
         {MOCK_RECENT_SCANS.map((scan, i) => (
           <ScanItem
             key={scan.id}
@@ -571,11 +659,16 @@ export default function GuardDashboardScreen() {
       {/* ── Sticky header ─────────────────────────────────────────────── */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <BrandLogo height={22} />
+          <BrandLogo variant="icon" size={28} />
           <Text style={styles.headerTitle}>Guard Dashboard</Text>
         </View>
-        {/* Initials avatar OK for guard role */}
-        <StudentAvatar size={32} useHeadshot={false} initials="GD" />
+        {/* Initials avatar navigates to guard profile */}
+        <StudentAvatar
+          size={36}
+          useHeadshot={false}
+          initials="GD"
+          onPress={() => router.push('/(guard)/profile')}
+        />
       </View>
 
       {/* ── Scrollable body ───────────────────────────────────────────── */}

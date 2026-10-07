@@ -45,7 +45,7 @@ const CONTACTS = [
     subtitle: 'Available 24/7',
     icon: 'local-police' as const,
     iconBgColor: 'rgba(42,105,250,0.15)',
-    iconColorValue: brand.blue,
+    isError: false,
   },
   {
     id: 'health',
@@ -53,7 +53,7 @@ const CONTACTS = [
     subtitle: 'Medical Assistance',
     icon: 'health-and-safety' as const,
     iconBgColor: 'rgba(186,26,26,0.12)',
-    iconColorIsError: true,
+    isError: true,
   },
 ] as const;
 
@@ -253,7 +253,7 @@ export default function EmergencyScreen() {
                     <MaterialIcons
                       name={c.icon}
                       size={22}
-                      color={'iconColorIsError' in c && c.iconColorIsError ? palette.error : c.iconColorValue}
+                      color={c.isError ? palette.error : brand.blue}
                     />
                   </View>
                   <View>

@@ -1,51 +1,78 @@
 import React from 'react';
-import { Image, View, StyleSheet, type ImageStyle, type ViewStyle } from 'react-native';
+import { Image, StyleSheet, type ImageStyle, type StyleProp } from 'react-native';
 import { Images } from '@/constants/assets';
 import { useTheme } from '@/hooks/useTheme';
-import { radius } from '@/theme/radius';
 
-type Props = {
+export type BrandLogoVariant = 'icon' | 'with-name' | 'app-logo';
+
+export type BrandLogoProps = {
+  /**
+   * Logo variant:
+   *  • 'icon': 1:1 symbol without name (used in topbars/headers)
+   *  • 'with-name': Horizontal logo with name next to symbol (used in login / auth screens)
+   *  • 'app-logo': Master rich app logo badge
+   * Defaults to 'icon' when height <= 36 (topbar scale), else 'with-name'.
+   */
+  variant?: BrandLogoVariant;
+  /** Force 'light' or 'dark' asset. If 'auto' (default), follows active app theme */
+  themeMode?: 'light' | 'dark' | 'auto';
   height?: number;
-  style?: ViewStyle;
-  imageStyle?: ImageStyle;
+  size?: number;
+  style?: StyleProp<ImageStyle>;
+  imageStyle?: StyleProp<ImageStyle>;
 };
 
-/**
- * StuSecure wordmark + shield logo.
- * On dark backgrounds the PNG's white plate is wrapped in a small white chip
- * so the navy wordmark stays legible.
- */
-export default function BrandLogo({ height = 28, style, imageStyle }: Props) {
+export default function BrandLogo({
+  variant,
+  themeMode = 'auto',
+  height,
+  size,
+  style,
+  imageStyle,
+}: BrandLogoProps) {
   const { isDark } = useTheme();
-  const width = Math.round(height * 3.2);
+
+  const effectiveDark =
+    themeMode === 'dark' ? true : themeMode === 'light' ? false : isDark;
+
+  const targetHeight = size ?? height ?? 28;
+  const effectiveVariant: BrandLogoVariant =
+    variant ?? (targetHeight <= 36 ? 'icon' : 'with-name');
+
+  let source;
+  let targetWidth = targetHeight;
+
+  if (effectiveVariant === 'icon') {
+    // 1:1 symbol/icon without text
+    source = effectiveDark ? Images.appIconDark : Images.appIconLight;
+    targetWidth = targetHeight;
+  } else if (effectiveVariant === 'with-name') {
+    // Horizontal lockup: 880x240 (ratio ~3.67)
+    source = effectiveDark ? Images.appLogoWithNameDark : Images.appLogoWithNameLight;
+    targetWidth = Math.round(targetHeight * 3.67);
+  } else {
+    // Master App Logo (1:1)
+    source = Images.appLogo;
+    targetWidth = targetHeight;
+  }
 
   return (
-    <View
+    <Image
+      source={source}
       style={[
-        styles.wrap,
-        isDark && styles.darkChip,
-        { height: isDark ? height + 8 : height },
+        styles.image,
+        { height: targetHeight, width: targetWidth },
+        imageStyle,
         style,
-      ]}>
-      <Image
-        source={Images.logo}
-        style={[{ height, width }, imageStyle]}
-        resizeMode="contain"
-        accessibilityLabel="StuSecure"
-      />
-    </View>
+      ]}
+      resizeMode="contain"
+      accessibilityLabel={effectiveVariant === 'icon' ? 'StuSecure Icon' : 'StuSecure Logo'}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  darkChip: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: radius.md,
-    paddingHorizontal: 6,
+  image: {
+    backgroundColor: 'transparent',
   },
 });

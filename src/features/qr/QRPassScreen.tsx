@@ -283,7 +283,7 @@ export default function QRPassScreen() {
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <BrandLogo height={22} />
+          <BrandLogo variant="icon" size={28} />
           <Text style={styles.headerTitle}>Student QR</Text>
         </View>
         <StudentAvatar

@@ -75,7 +75,7 @@ export default function NotificationInboxScreen({ title = 'Alerts' }: { title?: 
     <SafeAreaView style={[styles.safe, { backgroundColor: palette.background }]} edges={['top']}>
       <StatusBar barStyle={statusBarStyle} backgroundColor={palette.background} />
       <View style={styles.header}>
-        <BrandLogo height={22} />
+        <BrandLogo variant="icon" size={26} />
         <Text style={[styles.title, { color: palette.textPrimary, flex: 1 }]}>{title}</Text>
         {items.some((n) => !n.isRead) ? (
           <TouchableOpacity onPress={() => void onReadAll()}>

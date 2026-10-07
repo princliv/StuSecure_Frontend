@@ -176,7 +176,7 @@ export default function LoginScreen() {
         >
           {/* ── Logo / hero ───────────────────────────────────────────── */}
           <View style={styles.heroSection}>
-            <BrandLogo height={44} style={{ marginBottom: spacing.lg }} />
+            <BrandLogo variant="with-name" height={52} style={{ marginBottom: spacing.lg }} />
             <Text style={styles.heroTitle}>Welcome back</Text>
             <Text style={styles.heroSubtitle}>Secure access to your campus life.</Text>
           </View>

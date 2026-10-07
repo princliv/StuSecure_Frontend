@@ -164,7 +164,7 @@ export default function RegisterScreen() {
         >
           {/* ── Logo / hero ───────────────────────────────────────────── */}
           <View style={styles.heroSection}>
-            <BrandLogo height={44} style={{ marginBottom: spacing.lg }} />
+            <BrandLogo variant="with-name" height={52} style={{ marginBottom: spacing.lg }} />
             <Text style={styles.heroTitle}>Create your account</Text>
             <Text style={styles.heroSubtitle}>
               Claim the account your organization set up for you.

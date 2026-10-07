@@ -1,4 +1,4 @@
-﻿import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
@@ -41,7 +41,7 @@ export default function FacultyDashboard() {
     <SafeAreaView style={[styles.safe, { backgroundColor: palette.background }]} edges={['top']}>
       <StatusBar barStyle={statusBarStyle} backgroundColor={palette.background} />
       <View style={styles.header}>
-        <BrandLogo height={22} />
+        <BrandLogo variant="icon" size={26} />
         <Text style={[styles.title, { color: palette.textPrimary }]}>Dashboard</Text>
       </View>
       <ScrollView contentContainerStyle={styles.body}>

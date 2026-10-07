@@ -417,8 +417,7 @@ export default function QRScannerScreen() {
           </TouchableOpacity>
 
           <View style={styles.headerTitleRow}>
-            {/* BrandLogo wrapped in a white chip (handled internally by BrandLogo for dark bg) */}
-            <BrandLogo height={18} />
+            <BrandLogo variant="icon" size={24} />
             <Text style={styles.headerTitle}>Guard Scan</Text>
           </View>
 

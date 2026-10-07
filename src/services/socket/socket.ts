@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client';
+import { BACKEND_ORIGIN } from '@/services/api/client';
 
-const SOCKET_URL = process.env.EXPO_PUBLIC_API_URL?.replace('/api', '') ?? 'http://localhost:5000';
+const SOCKET_URL = BACKEND_ORIGIN;
 
 let socket: Socket | null = null;
 

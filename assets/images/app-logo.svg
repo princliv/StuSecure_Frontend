@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Shield Rim Gradient -->
+    <linearGradient id="masterRim" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#00E5FF"/>
+      <stop offset="28%" stop-color="#2A69FA"/>
+      <stop offset="65%" stop-color="#155EEF"/>
+      <stop offset="100%" stop-color="#0047BA"/>
+    </linearGradient>
+
+    <!-- Shield Left Facet -->
+    <linearGradient id="masterLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0D2A54"/>
+      <stop offset="100%" stop-color="#071830"/>
+    </linearGradient>
+
+    <!-- Shield Right Facet -->
+    <linearGradient id="masterRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B55A0"/>
+      <stop offset="55%" stop-color="#123B70"/>
+      <stop offset="100%" stop-color="#0C2547"/>
+    </linearGradient>
+
+    <!-- Inner Core & Monogram Gradient -->
+    <linearGradient id="masterCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="45%" stop-color="#E0F2FE"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+
+    <linearGradient id="cyanRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+
+    <!-- Soft Drop Shadow -->
+    <filter id="masterShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#071326" flood-opacity="0.4"/>
+    </filter>
+
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- MASTER SHIELD (NO BACKGROUND RECTANGLE) -->
+  <g filter="url(#masterShadow)">
+    <!-- Outer Shield Beveled Rim -->
+    <path d="M 256 42
+             C 348 42, 416 62, 432 94
+             C 438 186, 428 308, 256 450
+             C 84 308, 74 186, 80 94
+             C 96 62, 164 42, 256 42 Z"
+          fill="none" stroke="url(#masterRim)" stroke-width="18" stroke-linejoin="round"/>
+
+    <!-- Inner Shield Left Facet -->
+    <path d="M 256 58
+             L 94 102
+             C 89 180, 99 292, 256 432
+             L 256 58 Z"
+          fill="url(#masterLeft)"/>
+
+    <!-- Inner Shield Right Facet -->
+    <path d="M 256 58
+             L 418 102
+             C 423 180, 413 292, 256 432
+             L 256 58 Z"
+          fill="url(#masterRight)"/>
+
+    <!-- Center Spine Highlight -->
+    <line x1="256" y1="58" x2="256" y2="432" stroke="#00E5FF" stroke-width="2.5" opacity="0.6"/>
+
+    <!-- Dynamic S-Shield Circuit Wings (Glow Layer) -->
+    <path d="M 194 154
+             C 194 125, 226 112, 256 112
+             C 294 112, 326 130, 326 162
+             C 326 195, 284 210, 252 225
+             C 218 240, 188 258, 188 302
+             C 188 344, 224 364, 256 364
+             C 294 364, 324 346, 330 326"
+          fill="none" stroke="url(#cyanRibbon)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"
+          filter="url(#softGlow)" opacity="0.35"/>
+
+    <!-- Dynamic Monogram S & Security Shield Core -->
+    <path d="M 194 154
+             C 194 125, 226 112, 256 112
+             C 294 112, 326 130, 326 162
+             C 326 195, 284 210, 252 225
+             C 218 240, 188 258, 188 302
+             C 188 344, 224 364, 256 364
+             C 294 364, 324 346, 330 326"
+          fill="none" stroke="url(#masterCore)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Center Security Hub (Padlock & Gateway) -->
+    <circle cx="256" cy="234" r="32" fill="#0A1E3D" stroke="url(#masterRim)" stroke-width="5"/>
+    <circle cx="256" cy="234" r="16" fill="url(#masterCore)"/>
+    <circle cx="256" cy="234" r="7" fill="#071326"/>
+    <line x1="256" y1="250" x2="256" y2="284" stroke="#38BDF8" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Accent Pin Nodes -->
+    <circle cx="256" cy="72" r="5" fill="#00E5FF"/>
+    <circle cx="120" cy="112" r="4" fill="#00E5FF" opacity="0.8"/>
+    <circle cx="392" cy="112" r="4" fill="#00E5FF" opacity="0.8"/>
+  </g>
+</svg>

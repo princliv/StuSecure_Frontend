@@ -3,8 +3,8 @@
  * Admin functionality lives exclusively on the web dashboard (StuSecure_Admin).
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, StatusBar, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
@@ -14,31 +14,26 @@ import { radius } from '@/theme/radius';
 import { spacing } from '@/theme/spacing';
 import BrandLogo from '@/components/ui/BrandLogo';
 import Button from '@/components/ui/Button';
+import LogoutConfirmationModal from '@/components/feedback/LogoutConfirmationModal';
 import { performSignOut } from '@/features/auth/signOut';
 
 export default function AdminWebOnlyScreen() {
   const { palette, statusBarStyle } = useTheme();
   const styles = makeStyles(palette);
-
-  const handleLogout = () => {
-    Alert.alert('Sign out?', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: () => void performSignOut() },
-    ]);
-  };
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <StatusBar barStyle={statusBarStyle} backgroundColor={palette.background} />
 
       <View style={styles.container}>
-        <BrandLogo height={44} style={{ marginBottom: spacing.xl }} />
+        <BrandLogo variant="with-name" height={52} style={{ marginBottom: spacing.xl }} />
 
         <View style={styles.card}>
           <View style={styles.cardTopStripe} />
 
           <View style={styles.iconWrap}>
-            <MaterialIcons name="computer" size={48} color={brand.blue} />
+            <MaterialIcons name="computer" size={44} color={brand.blue} />
           </View>
 
           <Text style={styles.title}>Admin Access — Web Only</Text>
@@ -58,10 +53,21 @@ export default function AdminWebOnlyScreen() {
         <Button
           label="Sign Out"
           variant="outline"
-          onPress={handleLogout}
+          onPress={() => setLogoutModalVisible(true)}
           style={{ marginTop: spacing.xl, width: '100%' }}
         />
       </View>
+
+      <LogoutConfirmationModal
+        visible={logoutModalVisible}
+        onClose={() => setLogoutModalVisible(false)}
+        onConfirm={async () => {
+          setLogoutModalVisible(false);
+          await performSignOut();
+        }}
+        title="Sign Out of Admin Account?"
+        description="Are you sure you want to sign out? You can sign in as a student, guard, or faculty on this mobile device."
+      />
     </SafeAreaView>
   );
 }
@@ -111,13 +117,13 @@ function makeStyles(palette: AppPalette) {
     },
 
     iconWrap: {
-      width: 80,
-      height: 80,
+      width: 76,
+      height: 76,
       borderRadius: radius.xl,
       backgroundColor: palette.surfaceVariant,
       alignItems: 'center',
       justifyContent: 'center',
-      marginTop: spacing.md,
+      marginTop: spacing.sm,
     },
 
     title: {

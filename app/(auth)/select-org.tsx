@@ -27,6 +27,7 @@ import { radius } from '@/theme/radius';
 import { spacing } from '@/theme/spacing';
 import BrandLogo from '@/components/ui/BrandLogo';
 import Button from '@/components/ui/Button';
+import LogoutConfirmationModal from '@/components/feedback/LogoutConfirmationModal';
 import { useAuthStore } from '@/store/auth.store';
 import { switchOrg } from '@/features/auth/orgs.api';
 import type { Membership } from '@/features/auth/orgs.api';
@@ -43,6 +44,7 @@ const ROLE_ICON: Record<string, React.ComponentProps<typeof MaterialIcons>['name
 export default function SelectOrgScreen() {
   const { palette, statusBarStyle } = useTheme();
   const styles = makeStyles(palette);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const { memberships, selectOrg } = useAuthStore();
   const [switching, setSwitching] = useState<string | null>(null); // orgId being switched
@@ -63,10 +65,7 @@ export default function SelectOrgScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert('Sign out?', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: () => void performSignOut() },
-    ]);
+    setLogoutModalVisible(true);
   };
 
   return (
@@ -80,7 +79,7 @@ export default function SelectOrgScreen() {
       >
         {/* ── Hero ──────────────────────────────────────────────────────── */}
         <View style={styles.heroSection}>
-          <BrandLogo height={44} style={{ marginBottom: spacing.lg }} />
+          <BrandLogo variant="with-name" height={52} style={{ marginBottom: spacing.lg }} />
           <Text style={styles.heroTitle}>Choose Organization</Text>
           <Text style={styles.heroSubtitle}>
             Select the organization you want to access.
@@ -165,6 +164,17 @@ export default function SelectOrgScreen() {
           </TouchableOpacity>
         ) : null}
       </ScrollView>
+
+      <LogoutConfirmationModal
+        visible={logoutModalVisible}
+        onClose={() => setLogoutModalVisible(false)}
+        onConfirm={async () => {
+          setLogoutModalVisible(false);
+          await performSignOut();
+        }}
+        title="Sign Out of Account?"
+        description="Are you sure you want to sign out? You will need to enter your credentials again to select an organization."
+      />
     </SafeAreaView>
   );
 }

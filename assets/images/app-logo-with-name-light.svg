@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 240" width="880" height="240">
+  <defs>
+    <linearGradient id="hLightRim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#071A33"/>
+      <stop offset="40%" stop-color="#155EEF"/>
+      <stop offset="100%" stop-color="#0040C1"/>
+    </linearGradient>
+
+    <linearGradient id="hLightLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A2244"/>
+      <stop offset="100%" stop-color="#071A33"/>
+    </linearGradient>
+
+    <linearGradient id="hLightRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#155EEF"/>
+      <stop offset="60%" stop-color="#0F4CD9"/>
+      <stop offset="100%" stop-color="#0B39A8"/>
+    </linearGradient>
+
+    <linearGradient id="hLightCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="70%" stop-color="#F0F6FF"/>
+      <stop offset="100%" stop-color="#DBEAFE"/>
+    </linearGradient>
+
+    <filter id="hLightShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#071A33" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <!-- Symbol on Left: Scaled to ~180px height -->
+  <g transform="translate(10, 8) scale(0.48)" filter="url(#hLightShadow)">
+    <path d="M 256 40
+             C 344 40, 408 60, 424 90
+             C 430 178, 420 296, 256 424
+             C 92 296, 82 178, 88 90
+             C 104 60, 168 40, 256 40 Z"
+          fill="none" stroke="url(#hLightRim)" stroke-width="20" stroke-linejoin="round"/>
+
+    <path d="M 256 56
+             L 102 96
+             C 97 172, 107 278, 256 406
+             L 256 56 Z"
+          fill="url(#hLightLeft)"/>
+
+    <path d="M 256 56
+             L 410 96
+             C 415 172, 405 278, 256 406
+             L 256 56 Z"
+          fill="url(#hLightRight)"/>
+
+    <line x1="256" y1="56" x2="256" y2="406" stroke="#FFFFFF" stroke-width="2" opacity="0.4"/>
+
+    <path d="M 194 150
+             C 194 124, 222 112, 256 112
+             C 290 112, 320 128, 320 158
+             C 320 188, 282 202, 252 216
+             C 218 232, 192 248, 192 294
+             C 192 334, 222 352, 256 352
+             C 290 352, 318 336, 324 320"
+          fill="none" stroke="url(#hLightCore)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <circle cx="256" cy="224" r="32" fill="#071A33" stroke="#FFFFFF" stroke-width="4"/>
+    <circle cx="256" cy="224" r="15" fill="#FFFFFF"/>
+    <circle cx="256" cy="224" r="7" fill="#155EEF"/>
+    <line x1="256" y1="240" x2="256" y2="274" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Typography on Right (NO background box) -->
+  <g transform="translate(250, 138)">
+    <text font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+          font-size="82" font-weight="800" letter-spacing="-1.5">
+      <tspan fill="#071A33">Stu</tspan><tspan fill="#155EEF">Secure</tspan>
+    </text>
+  </g>
+
+  <!-- Pure Transparent Tagline (NO rect background) -->
+  <g transform="translate(254, 182)">
+    <circle cx="8" cy="0" r="5" fill="#155EEF"/>
+    <text x="24" y="4" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#4A5568" letter-spacing="2.8">
+      CAMPUS SAFETY
+    </text>
+  </g>
+</svg>
